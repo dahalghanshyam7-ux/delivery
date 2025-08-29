@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SAFALTA DELIVERY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+  /* (तपाईंको पुरानो CSS यहाँ राख्नुहोस्, जसमा कुनै परिवर्तन छैन) */
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; 
+    font-family: Inter, Arial, sans-serif; 
+    background: #f4f4f4; 
+    color: #333; 
+    padding: 10px;
+  }
+  h1 {
+    background: linear-gradient(135deg, #ffd700, #ffed4e); 
+    color: #000; 
+    text-align: center; 
+    padding: 15px; 
+    border-radius: 10px; 
+    animation: fadeIn 0.6s; 
+    margin: 0 0 20px 0; 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  @keyframes fadeIn { 
+    from { opacity: 0; transform: translateY(-6px); } 
+    to { opacity: 1; transform: translateY(0); } 
+  }
+  .rider-input { 
+    text-align: center; 
+    margin: 15px 0; 
+    padding: 15px; 
+    background: #fff; 
+    border-radius: 10px; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+    animation: slideIn 0.5s; 
+  }
+  @keyframes slideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .table-container { 
+    overflow-x: auto; 
+    margin: 5px 0; 
+    background: #fff; 
+    padding: 15px; 
+    border-radius: 10px; 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+    animation: fadeIn 0.6s; 
+  }
+  .table-container h2 { 
+    text-align: center; 
+    margin-bottom: 15px; 
+    color: #2c3e50; 
+  }
+  table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    min-width: 600px; 
+  }
+  th, td { 
+    border: 1px solid #ddd; 
+    padding: 12px; 
+    text-align: center; 
+    transition: background-color 0.3s ease; 
+  }
+  th { 
+    background: linear-gradient(135deg, #3498db, #2980b9); 
+    color: white; 
+    font-weight: bold; 
+  }
+  tr:nth-child(even) { 
+    background-color: #f9f9f9; 
+  }
+  tr:hover { 
+    background-color: #f5f5f5; 
+    animation: highlight 0.3s; 
+  }
+  @keyframes highlight {
+    from { background-color: #f5f5f5; }
+    to { background-color: #e0e0e0; }
+  }
+  .btn { 
+    margin: 5px; 
+    padding: 12px 18px; 
+    border: none; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-weight: bold; 
+    transition: all 0.2s ease; 
+    font-size: 14px; 
+    animation: pulse 1s infinite; 
+  }
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  .btn:hover { 
+    transform: translateY(-1px); 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
+  }
+  .btn:active { 
+    transform: translateY(0); 
+  }
+  .add { 
+    background: linear-gradient(135deg, #28a745, #20c997); 
+    color: #fff; 
+  }
+  .delete { 
+    background: linear-gradient(135deg, #dc3545, #c82333); 
+    color: #fff; 
+  }
+  .download { 
+    background: linear-gradient(135deg, #007bff, #0056b3); 
+    color: #fff; 
+    margin: 20px auto; 
+    display: block; 
+    width: 220px; 
+    font-size: 16px; 
+  }
+  .addTable { 
+    background: linear-gradient(135deg, #17a2b8, #138496); 
+    color: #fff; 
+  }
+  input, select { 
+    width: 90%; 
+    padding: 8px 12px; 
+    border: 2px solid #ddd; 
+    border-radius: 6px; 
+    font-size: 14px; 
+    transition: border-color 0.3s ease; 
+  }
+  input:focus, select:focus { 
+    outline: none; 
+    border-color: #3498db; 
+    box-shadow: 0 0 5px rgba(52,152,219,0.3); 
+  }
+  input[readonly] { 
+    background-color: #f8f9fa; 
+    color: #6c757d; 
+  }
+  .rowTotal { 
+    font-weight: bold; 
+    color: #2c3e50; 
+    background-color: #e8f4fd; 
+  }
+  .modal { 
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0; 
+    top: 0; 
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background: rgba(0,0,0,0.5); 
+    animation: fadeIn 0.3s; 
+  }
+  .modal-content { 
+    background: #fff; 
+    margin: 10% auto; 
+    padding: 25px; 
+    border-radius: 12px; 
+    width: 90%; 
+    max-width: 400px; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
+    animation: slideIn 0.5s; 
+  }
+  .close { 
+    color: #aaa; 
+    float: right; 
+    font-size: 28px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    line-height: 1; 
+  }
+  .close:hover { 
+    color: #000; 
+  }
+  .modal h3 { 
+    margin-top: 0; 
+    color: #2c3e50; 
+    text-align: center; 
+  }
+  /* Mobile */
+  @media (max-width: 768px) { 
+    body { padding: 8px; } 
+    h1 { font-size: 20px; padding: 12px; margin-bottom: 15px; } 
+    .rider-input input { width: 90%; font-size: 14px; padding: 10px; } 
+    .table-container { padding: 10px; margin: 15px 0; } 
+    table { min-width: unset; width: 100%; display: block; overflow-x: auto; } 
+    th, td { padding: 8px; font-size: 12px; } 
+    .btn { padding: 10px 12px; font-size: 12px; margin: 3px; } 
+    .download { width: 90%; max-width: 240px; font-size: 14px; } 
+    input, select { width: 100%; padding: 6px 8px; font-size: 12px; } 
+    .modal-content { margin: 20% auto; padding: 20px; width: 95%; } 
+    .modal input { padding: 10px; font-size: 14px; } 
+  } 
+  @media (max-width: 480px) { 
+    h1 { font-size: 18px; } 
+    .table-container { padding: 8px; } 
+    th, td { padding: 6px; font-size: 11px; } 
+    .btn { padding: 8px 10px; font-size: 11px; } 
+    input, select { padding: 5px; font-size: 11px; } 
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1>SAFALTA DELIVERY</h1>
+  <div class="rider-input">
+    Today Date: <input type="text" id="riderName" placeholder="Enter Date" />
+  </div>
+  <div id="tables">
+    <div class="table-container">
+      <table id="deliveryTable">
+        <thead>
+          <tr>
+            <th>S.N</th>
+            <th>Location</th>
+            <th>Item Name</th>
+            <th>Quantity</th>
+            <th>Amount</th>
+            <th>D.Charge</th>
+            <th>Total</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>
+              <select>
+                <option value="Kathmandu">Kathmandu</option>
+                <option value="Lalitpur">Lalitpur</option>
+                <option value="Bhaktapur">Bhaktapur</option>
+              </select>
+            </td>
+            <td><select class="itemSelect"></select></td>
+            <td><input type="number" value="0" min="0" /></td>
+            <td><input type="number" value="0" min="0" step="0.01" /></td>
+            <td><input type="number" value="155" readonly /></td>
+            <td class="rowTotal">0</td>
+            <td><button class="btn delete" onclick="deleteRow(this)">Delete Row</button></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="4">Grand Total</th>
+            <th id="totalAmount">0</th>
+            <th id="totalDelivery">0</th>
+            <th id="totalGrand">0</th>
+            <th></th>
+          </tr>
+        </tfoot>
+      </table>
+      <button class="btn add" onclick="addRow()" style="margin-top: 15px;">Add Row</button>
+    </div>
+  </div>
+  <div class="table-container">
+    <h2>STOCK</h2>
+    <table id="stockTable">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Sale Product</th>
+          <th></th>
+          <th>Update Quantity</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Jaiphal Oil</td>
+          <td>50</td>
+          <td class="saleQty">0</td>
+          <td></td>
+          <td><button class="btn add" onclick="openUpdateQuantityModal('Jaiphal Oil')">Update Quantity</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <button class="btn add" onclick="openModal()" style="margin-top: 15px;">Add Stock</button>
+  </div>
+</div>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SAFALTA DELIVERY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<script>
+  const deliveryTable = document.getElementById('deliveryTable').getElementsByTagName('tbody')[0];
+  const stockTable = document.getElementById('stockTable').getElementsByTagName('tbody')[0];
+  const riderInput = document.getElementById('riderName');
+
+  let stockData = {};
+  let currentUpdateProduct = null;
+
+  // -------- STOCK FUNCTIONS --------
+  function refreshStockData() {
+    stockData = {};
+    Array.from(stockTable.rows).forEach(r => {
+      const name = r.cells[0].innerText.trim();
+      const qty = parseFloat(r.cells[1].innerText) || 0;
+      const saleQty = parseFloat(r.querySelector('.saleQty')?.innerText) || 0;
+      stockData[name] = { qty, saleQty };
+    });
+  }
+
+  function refreshItems() {
+    const items = Object.keys(stockData);
+    document.querySelectorAll('.itemSelect').forEach(sel => {
+      const prev = sel.value;
+      sel.innerHTML = '';
+      items.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item;
+        opt.textContent = item;
+        sel.appendChild(opt);
+      });
+      sel.value = items.includes(prev) ? prev : (items[0] || '');
+    });
+  }
+
+  // -------- DELIVERY FUNCTIONS --------
+  function updateTotals() {
+    refreshStockData();
+    let totalAmount = 0, totalDelivery = 0, totalGrand = 0;
+
+    // Reset SaleQty
+    Object.keys(stockData).forEach(item => {
+      stockData[item].saleQty = 0;
+    });
+
+    Array.from(deliveryTable.rows).forEach(row => {
+      const itemSel = row.cells[2].querySelector('select');
+      const qtyInput = row.cells[3].querySelector('input');
+      const amtInput = row.cells[4].querySelector('input');
+      const delInput = row.cells[5].querySelector('input');
+
+      const item = itemSel.value;
+      let qty = parseFloat(qtyInput.value) || 0;
+      const amt = parseFloat(amtInput.value) || 0;
+      const del = parseFloat(delInput.value) || 0;
+
+      // Sale Qty update
+      if (stockData[item]) stockData[item].saleQty += qty;
+
+      // Total = Amount - Delivery
+      const total = amt - del;
+      row.cells[6].innerText = total.toFixed(2);
+
+      totalAmount += amt;
+      totalDelivery += del;
+      totalGrand += total;
+    });
+
+    // Update Stock Table
+    Array.from(stockTable.rows).forEach(r => {
+      const name = r.cells[0].innerText.trim();
+      if (stockData[name]) {
+        r.querySelector('.saleQty').innerText = stockData[name].saleQty;
+        const remaining = (parseFloat(r.getAttribute('data-initialQty')) || 0) - stockData[name].saleQty;
+        r.cells[1].innerText = remaining;
+      }
+    });
+
+    // Totals
+    document.getElementById('totalAmount').innerText = totalAmount.toFixed(2);
+    document.getElementById('totalDelivery').innerText = totalDelivery.toFixed(2);
+    document.getElementById('totalGrand').innerText = totalGrand.toFixed(2);
+  }
+
+  function addRow(data = null) {
+    const row = deliveryTable.insertRow();
+    const sn = deliveryTable.rows.length;
+    row.innerHTML = `
+      <td>${sn}</td>
+      <td>
+        <select>
+          <option value="Kathmandu">Kathmandu</option>
+          <option value="Lalitpur">Lalitpur</option>
+          <option value="Bhaktapur">Bhaktapur</option>
+        </select>
+      </td>
+      <td><select class="itemSelect"></select></td>
+      <td><input type='number' value='0' min='0'></td>
+      <td><input type='number' value='0' min='0' step='0.01'></td>
+      <td><input type='number' value='155' min='0'></td>
+      <td class='rowTotal'>0</td>
+      <td><button class='btn delete' onclick='deleteRow(this)'>Delete Row</button></td>`;
+    
+    refreshItems();
+
+    if (data) {
+      row.cells[1].querySelector("select").value = data.location;
+      row.cells[2].querySelector("select").value = data.item;
+      row.cells[3].querySelector("input").value = data.qty;
+      row.cells[4].querySelector("input").value = data.amount;
+      row.cells[5].querySelector("input").value = data.delivery;
+    }
+
+    row.querySelectorAll('input, select').forEach(inp => {
+      inp.addEventListener('input', updateTotals);
+      inp.addEventListener('change', updateTotals);
+    });
+
+    updateTotals();
+  }
+
+  function deleteRow(btn) {
+    const row = btn.closest('tr');
+    row.remove();
+    updateTotals();
+  }
+
+  // ---------- STOCK MODAL ----------
+  function openModal() {
+    document.getElementById('stockModal').style.display = 'block';
+  }
+
+  function closeModal() {
+    document.getElementById('stockModal').style.display = 'none';
+  }
+
+  function addStockFromModal() {
+    const product = document.getElementById('modalProduct').value.trim();
+    const qty = parseFloat(document.getElementById('modalQuantity').value) || 0;
+    if (!product || qty <= 0) return alert("Please enter product and quantity");
+
+    const row = stockTable.insertRow();
+    row.setAttribute("data-initialQty", qty);
+    row.innerHTML = `
+      <td>${product}</td>
+      <td>${qty}</td>
+      <td class="saleQty">0</td>
+      <td></td>
+      <td><button class="btn add" onclick="openUpdateQuantityModal('${product}')">Update Quantity</button></td>
+    `;
+
+    refreshStockData();
+    refreshItems();
+    closeModal();
+    updateTotals();
+  }
+
+  // ---------- UPDATE STOCK QTY ----------
+  function openUpdateQuantityModal(product) {
+    const newQty = prompt(`Enter new quantity for ${product}:`);
+    if (newQty !== null) {
+      Array.from(stockTable.rows).forEach(r => {
+        if (r.cells[0].innerText.trim() === product) {
+          r.cells[1].innerText = parseFloat(newQty) || 0;
+          r.setAttribute("data-initialQty", parseFloat(newQty) || 0);
+        }
+      });
+      refreshStockData();
+      refreshItems();
+      updateTotals();
+    }
+  }
+
+  // ---------- PDF DOWNLOAD ----------
+  async function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF("p", "pt", "a4");
+
+    await html2canvas(document.getElementById('app')).then(canvas => {
+      const imgData = canvas.toDataURL("image/png");
+      const imgWidth = 595; 
+      const pageHeight = 842; 
+      const imgHeight = canvas.height * imgWidth / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      doc.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        doc.addPage();
+        doc.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+    });
+
+    doc.save("safalta_delivery.pdf");
+  }
+
+  // ---------- SAVE ALL (localStorage) ----------
+  function saveAll() {
+    const data = {
+      date: riderInput.value,
+      deliveries: [],
+      stocks: []
+    };
+
+    Array.from(deliveryTable.rows).forEach(row => {
+      data.deliveries.push({
+        location: row.cells[1].querySelector("select").value,
+        item: row.cells[2].querySelector("select").value,
+        qty: row.cells[3].querySelector("input").value,
+        amount: row.cells[4].querySelector("input").value,
+        delivery: row.cells[5].querySelector("input").value
+      });
+    });
+
+    Array.from(stockTable.rows).forEach(row => {
+      data.stocks.push({
+        product: row.cells[0].innerText.trim(),
+        qty: row.cells[1].innerText,
+        saleQty: row.querySelector(".saleQty").innerText
+      });
+    });
+
+    localStorage.setItem("safaltaData", JSON.stringify(data));
+    alert("Data saved successfully!");
+  }
+
+  // ---------- INITIALIZE ----------
+  window.onload = function() {
+    refreshStockData();
+    refreshItems();
+    updateTotals();
+
+    // Load saved data
+    const saved = localStorage.getItem("safaltaData");
+    if (saved) {
+      const data = JSON.parse(saved);
+      riderInput.value = data.date || "";
+      
+      // Clear initial row
+      deliveryTable.innerHTML = "";
+      data.deliveries.forEach(d => addRow(d));
+
+      // Clear stock
+      stockTable.innerHTML = "";
+      data.stocks.forEach(s => {
+        const row = stockTable.insertRow();
+        row.setAttribute("data-initialQty", s.qty);
+        row.innerHTML = `
+          <td>${s.product}</td>
+          <td>${s.qty}</td>
+          <td class="saleQty">${s.saleQty}</td>
+          <td></td>
+          <td><button class="btn add" onclick="openUpdateQuantityModal('${s.product}')">Update Quantity</button></td>
+        `;
+      });
+    }
+
+    document.querySelectorAll('input, select').forEach(inp => {
+      inp.addEventListener('input', updateTotals);
+      inp.addEventListener('change', updateTotals);
+    });
+  }
+</script>
+</head></body></html>
